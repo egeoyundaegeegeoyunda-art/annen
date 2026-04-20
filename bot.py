@@ -1,3 +1,7 @@
+import os
+import http.server
+import socketserver
+import threading
 import logging
 import asyncio
 import random
@@ -174,7 +178,13 @@ def main():
     
     print("🚀 SyfrusVoid V12 Stabil Mod Aktif!")
     app.run_polling()
-
+def keep_alive():
+    PORT = int(os.environ.get("PORT", 8080))
+    handler = http.server.SimpleHTTPRequestHandler
+    with socketserver.TCPServer(("", PORT), handler) as httpd:
+        httpd.serve_forever()
+        
 if __name__ == "__main__":
-    main()
+    main(threading.Thread(target=keep_alive, daemon=True).start()
+        )
   
